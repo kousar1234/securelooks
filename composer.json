@@ -1,0 +1,18 @@
+{
+    "name": "themelooks/securelooks",
+    "description": "License validation system of laravel project",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kousar Rahman",
+            "email": "kousar.themelooks@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ThemeLooks\\SecureLooks\\": "securelooks/src"
+        }
+    }
+}
