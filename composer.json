@@ -12,7 +12,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "ThemeLooks\\SecureLooks\\": "themelooks/securelooks/src"
+            "ThemeLooks\\SecureLooks\\": "src"
         }
     }
 }
