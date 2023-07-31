@@ -1,6 +1,6 @@
 <?php
 
-namespace ThemeLooks\SecureLooks;
+namespace ThemeLooks\SecureLooks\Model;
 
 use Illuminate\Database\Eloquent\Model;
 

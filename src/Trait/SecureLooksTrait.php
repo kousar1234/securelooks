@@ -1,35 +1,25 @@
 <?php
 
-namespace ThemeLooks\SecureLooks;
+namespace ThemeLooks\SecureLooks\Trait;
 
-use ThemeLooks\SecureLooks\License;
 use Illuminate\Support\Facades\Http;
+use ThemeLooks\SecureLooks\Model\License;
 
-class SecureLooksService
+trait SecureLooksTrait
 {
 
-    protected $base_path = "http://tlcommerce.license";
-
-    public function init()
+    public function getLicenseKeys()
     {
-        $licenses = License::select(['license_key'])->get();
-        foreach ($licenses as $license) {
-
-            if (!cache()->has('license-valid-' . $license->license_key)) {
-                $this->validDomain($license->license_key);
-            }
-
-            if (cache()->has('license-valid-' . $license->license_key) && !cache()->get('license-valid-' . $license->license_key)) {
-                $this->validDomain($license->license_key);
-            }
-        }
+        return License::select(['license_key'])->get();
     }
 
-    public function registerApp($request)
+    public function validateNewLicense($purchase_key, $request, $api_url = null)
     {
         try {
-            $response = Http::withOptions(['verify' => false])->post($this->base_path . '/api/v1/verify-license-key', [
-                'purchase_key' => $request['license'],
+            $api_url = $api_url != null ? $api_url : $this->baseApiUrl() . '/api/v1/verify-license-key';
+
+            $response = Http::withOptions(['verify' => false])->post($api_url, [
+                'purchase_key' => $purchase_key,
                 'user_name' => auth()->user()->name,
                 'email' => auth()->user()->email,
                 'password' => auth()->user()->password,
@@ -54,13 +44,10 @@ class SecureLooksService
                 if ($response_body['success'] && $response_body['activated']) {
                     $license_info = json_decode($response_body['license_key'], true);
 
-                    $license = License::firstOrCreate(['item' => $license_info['item']]);
-                    $license->license_key = $license_info['key'];
-                    $license->item_is = $license_info['item_is'];
-                    $license->save();
+                    $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
+                    $this->completedRegisterApp();
 
-                    setEnv('LICENSE_CHECKED', "1");
-                    return redirect()->route('core.admin.welcome');
+                    return redirect()->route('core.admin.' . implode('', ['w', 'e', 'l', 'c', 'o', 'm', 'e']));
                 }
 
                 if ($response_body['success'] && !$response_body['activated']) {
@@ -78,12 +65,12 @@ class SecureLooksService
         }
     }
 
-    public function validDomain($purchase_key)
+    public function domainValidation($purchase_key)
     {
         $domain = request()->getSchemeAndHttpHost();
         if (env('IS_USER_REGISTERED') == 1 && env('LICENSE_CHECKED') == 1) {
             try {
-                $response = Http::withOptions(['verify' => false])->post($this->base_path . '/api/v1/validate-license-key', [
+                $response = Http::withOptions(['verify' => false])->post($this->baseApiUrl() . '/api/v1/validate-license-key', [
                     'purchase_key' => $purchase_key,
                     'domain' => $domain
                 ]);
@@ -111,7 +98,7 @@ class SecureLooksService
                         $license_info = License::where('license_key', $purchase_key)->first();
                         //Core item
                         if ($license_info->item_is == 1) {
-                            setEnv('LICENSE_CHECKED', "");
+                            $this->redirectToActiveLicense();
                         }
 
                         //Plugin
@@ -143,5 +130,29 @@ class SecureLooksService
                 //next()
             }
         }
+    }
+
+
+    public function storeOrUpdateLicenseKey($item, $license_key, $item_is)
+    {
+        $license = License::firstOrCreate(['item' => $item]);
+        $license->license_key = $license_key;
+        $license->item_is = $item_is;
+        $license->save();
+    }
+
+    public function completedRegisterApp()
+    {
+        setEnv('LICENSE_CHECKED', "1");
+    }
+
+    public function redirectToActiveLicense()
+    {
+        setEnv('LICENSE_CHECKED', "");
+    }
+
+    public function baseApiUrl()
+    {
+        return config('themelooks.api_base_url');
     }
 }
