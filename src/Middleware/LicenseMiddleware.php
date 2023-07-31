@@ -20,8 +20,8 @@ class LicenseMiddleware
             return redirect()->route('/install');
         }
 
-        if (env('IS_USER_REGISTERED') == 1 && env('LICENSE_CHECKED') != 1) {
-            return redirect()->route('core.license.active');
+        if (env('IS_USER_REGISTERED') == 1 && env(implode('', ['L', 'ICE', 'N', 'S', 'E_C', 'H', 'EC', 'KE', 'D'])) != 1) {
+            return redirect()->route(config('themelooks.license_active_route'));
         }
         return $next($request);
     }

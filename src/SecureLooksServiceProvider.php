@@ -39,5 +39,7 @@ class SecureLooksServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/themelooks.php' => config_path('themelooks.php'),
         ], 'config');
+
+        SecureLooks::init();
     }
 }

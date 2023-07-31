@@ -45,9 +45,31 @@ trait SecureLooksTrait
                     $license_info = json_decode($response_body['license_key'], true);
 
                     $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
-                    $this->completedRegisterApp();
+                    //Core item
+                    if ($license_info['item_is'] == 1) {
+                        $this->completedRegisterApp();
+                        return redirect()->route(config('themelooks.core_success_route'));
+                    }
 
-                    return redirect()->route('core.admin.' . implode('', ['w', 'e', 'l', 'c', 'o', 'm', 'e']));
+                    //Plugin
+                    if ($license_info['item_is'] == 2) {
+                        $plugin = \Core\Models\Plugings::where('location', $license_info['item'])->first();
+                        if ($plugin != null) {
+                            $plugin->is_activated = 1;
+                            $plugin->save();
+                            return redirect()->route(config('themelooks.plugin_success_route'));
+                        }
+                    }
+
+                    //Theme
+                    if ($license_info['item_is'] == 3) {
+                        $theme = \Core\Models\Themes::where('location', $license_info['item'])->first();
+                        if ($theme != null) {
+                            $theme->is_activated = 1;
+                            $theme->save();
+                            return redirect()->route(config('themelooks.theme_success_route'));
+                        }
+                    }
                 }
 
                 if ($response_body['success'] && !$response_body['activated']) {
@@ -68,7 +90,7 @@ trait SecureLooksTrait
     public function domainValidation($purchase_key)
     {
         $domain = request()->getSchemeAndHttpHost();
-        if (env('IS_USER_REGISTERED') == 1 && env('LICENSE_CHECKED') == 1) {
+        if (env('IS_USER_REGISTERED') == 1 && env(implode('', ['L', 'I', 'CE', 'N', 'S', 'E_C', 'H', 'E', 'C', 'K', 'E', 'D'])) == 1) {
             try {
                 $response = Http::withOptions(['verify' => false])->post($this->baseApiUrl() . '/api/v1/validate-license-key', [
                     'purchase_key' => $purchase_key,
@@ -143,12 +165,12 @@ trait SecureLooksTrait
 
     public function completedRegisterApp()
     {
-        setEnv('LICENSE_CHECKED', "1");
+        setEnv(implode('', ['L', 'I', 'CE', 'N', 'S', 'E_C', 'H', 'E', 'C', 'KE', 'D']), "1");
     }
 
     public function redirectToActiveLicense()
     {
-        setEnv('LICENSE_CHECKED', "");
+        setEnv(implode('', ['L', 'I', 'C', 'E', 'N', 'S', 'E_C', 'HE', 'CKE', 'D']), "");
     }
 
     public function baseApiUrl()
