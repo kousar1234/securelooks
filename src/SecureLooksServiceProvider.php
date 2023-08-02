@@ -2,10 +2,9 @@
 
 namespace ThemeLooks\SecureLooks;
 
-use SecureLooks;
+use AppLoader;
 use Illuminate\Support\ServiceProvider;
 use ThemeLooks\SecureLooks\SecureLooks as SecureLooksService;
-use ThemeLooks\SecureLooks\Middleware\LicenseMiddleware;
 
 class SecureLooksServiceProvider extends ServiceProvider
 {
@@ -21,8 +20,7 @@ class SecureLooksServiceProvider extends ServiceProvider
             return new SecureLooksService;
         });
 
-        //Register middleware
-        app('router')->aliasMiddleware('license', LicenseMiddleware::class);
+        AppLoader::initApp();
 
         //Config
         $this->mergeConfigFrom(__DIR__ . '/../config/themelooks.php', 'themelooks');
@@ -40,6 +38,6 @@ class SecureLooksServiceProvider extends ServiceProvider
             __DIR__ . '/../config/themelooks.php' => config_path('themelooks.php'),
         ], 'config');
 
-        SecureLooks::init();
+        AppLoader::init();
     }
 }

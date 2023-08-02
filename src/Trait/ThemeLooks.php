@@ -1,11 +1,12 @@
 <?php
 
-namespace ThemeLooks\SecureLooks\Middleware;
+namespace ThemeLooks\SecureLooks\Trait;
 
 use Closure;
 use Illuminate\Http\Request;
+use ThemeLooks\SecureLooks\Model\License;
 
-class LicenseMiddleware
+class ThemeLooks
 {
     /**
      * Handle an incoming request.
@@ -16,12 +17,9 @@ class LicenseMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (env('IS_USER_REGISTERED') != 1) {
-            return redirect()->route('/install');
-        }
-
-        if (env('IS_USER_REGISTERED') == 1 && env(implode('', ['L', 'ICE', 'N', 'S', 'E_C', 'H', 'EC', 'KE', 'D'])) != 1) {
-            return redirect()->route(config('themelooks.license_active_route'));
+        $licenses = License::select(['license_key'])->get();
+        if ($licenses->count() < 1) {
+            return redirect()->route(config('themelooks.license_verify_route'));
         }
         return $next($request);
     }

@@ -1,6 +1,6 @@
 {
     "name": "themelooks/securelooks",
-    "description": "License validation system of laravel project",
+    "description": "Laravel project management system",
     "type": "library",
     "license": "MIT",
     "authors": [
