@@ -3,15 +3,24 @@
 namespace ThemeLooks\SecureLooks\Trait;
 
 use ThemeLooks\SecureLooks\Model\Key;
+use Illuminate\Support\Facades\Cache;
 use ThemeLooks\SecureLooks\Trait\Config as ConfigRepository;
 
 trait Helper
 {
     use ConfigRepository;
 
-    public function removeCoreItemKeys()
+    public function getKeys()
     {
-        Key::where('item_is', 1)->delete();
+        $keys = Cache::rememberForever('user_keys', function () {
+            return Key::select(['license_key', 'item'])->get();
+        });
+        return $keys;
+    }
+
+    public function getKeyInfo($key)
+    {
+        return Key::where('license_key', $key)->first();
     }
 
     public function storeOrUpdateLicenseKey($item, $license_key, $item_is)
@@ -20,11 +29,13 @@ trait Helper
         $license->license_key = $license_key;
         $license->item_is = $item_is;
         $license->save();
+        Cache::forget('user_keys');
     }
 
-    public function getKeys()
+    public function removeCoreItemKeys()
     {
-        return Key::select(['license_key', 'item'])->get();
+        Key::where('item_is', 1)->delete();
+        Cache::forget('user_keys');
     }
 
     public function themeActivated($theme, $purchase_key)

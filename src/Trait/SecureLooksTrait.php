@@ -4,7 +4,6 @@ namespace ThemeLooks\SecureLooks\Trait;
 
 use Illuminate\Support\Facades\Http;
 use ThemeLooks\SecureLooks\Trait\Helper;
-use ThemeLooks\SecureLooks\Model\License;
 use ThemeLooks\SecureLooks\Trait\Url as UrlHelper;
 use ThemeLooks\SecureLooks\Trait\Config as ConfigRepository;
 
@@ -101,7 +100,6 @@ trait SecureLooksTrait
     public function registerDomain($purchase_key, $item = null, $redirect = false)
     {
         $domain = request()->getSchemeAndHttpHost();
-
         if (env('IS_USER_REGISTERED') == 1 && env(implode('', ['L', 'I', 'CE', 'N', 'S', 'E_C', 'H', 'E', 'C', 'K', 'E', 'D'])) == 1) {
             try {
                 $response = Http::withOptions(['verify' => false])->post($this->baseApiUrl() . '/api/v1/validate-license-key', [
@@ -133,7 +131,6 @@ trait SecureLooksTrait
                     $response_body = json_decode($response->body(), true);
 
                     if ($response_body['success'] && $response_body['is_validate']) {
-
                         if (!$redirect) {
                             cache()->put('license-valid-' . $purchase_key, true, now()->addHours(5));
                         }
@@ -165,11 +162,11 @@ trait SecureLooksTrait
                     }
 
                     if ($response_body['success'] && !$response_body['is_validate']) {
-
                         if (!$redirect) {
-                            $license_info = License::where('license_key', $purchase_key)->first();
+                            $license_info = $this->getKeyInfo($purchase_key);
                             //Core item
                             if ($license_info->item_is == 1) {
+                                $this->removeCoreItemKeys();
                                 $this->redirectToActiveLicense();
                             }
 
@@ -205,7 +202,6 @@ trait SecureLooksTrait
                 }
             } catch (\Exception $e) {
                 if ($redirect) {
-                    dd($e);
                     return redirect()->back()->withErrors(['message' => 'Something went wrong. Please try again']);
                 }
             } catch (\Error $e) {
