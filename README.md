@@ -7,7 +7,7 @@ Laravel Project management system.
 You can install the package via composer:
 
 ```bash
-composer composer require themelooks/securelooks
+composer require themelooks/securelooks
 ```
 
 ## Usage
