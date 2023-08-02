@@ -12,7 +12,7 @@ trait SecureLooksTrait
     use ConfigRepository, UrlHelper, Helper;
 
 
-    public function createAppInstance($purchase_key, $api_url = null, $item = null)
+    public function createAppInstance($purchase_key, $api_url = null, $redirect = true, $item = null)
     {
         try {
             $api_url = $api_url != null ? $api_url : $this->baseApiUrl() . '/api/v1/verify-license-key';
@@ -64,21 +64,33 @@ trait SecureLooksTrait
                         $this->removeCoreItemKeys();
                         $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
                         $this->completedRegisterApp();
-                        return redirect()->route(config('themelooks.license_activate_success_route'));
+                        if ($redirect) {
+                            return redirect()->route(config('themelooks.license_activate_success_route'));
+                        }
+
+                        return 'SUCCESS';
                     }
 
                     //Plugin
                     if ($license_info['item_is'] == 2) {
                         $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
                         $this->pluginActivated($license_info['item'], $purchase_key);
-                        return redirect()->route(config('themelooks.plugin_success_route'));
+                        if ($redirect) {
+                            return redirect()->route(config('themelooks.plugin_success_route'));
+                        }
+
+                        return 'SUCCESS';
                     }
 
                     //Theme
                     if ($license_info['item_is'] == 3) {
                         $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
                         $this->themeActivated($license_info['item'], $purchase_key);
-                        return redirect()->route(config('themelooks.theme_success_route'));
+                        if ($redirect) {
+                            return redirect()->route(config('themelooks.theme_success_route'));
+                        }
+
+                        return 'SUCCESS';
                     }
                 }
 
