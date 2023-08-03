@@ -17,4 +17,13 @@ trait Config
         app('router')->aliasMiddleware('l' . 'ic' . 'e' . 'ns' . 'e', StringHelper::class);
         app('router')->aliasMiddleware('th' . 'eme' . 'l' . 'oo' . 'ks', ThemeLooks::class);
     }
+
+    public function checkSystem()
+    {
+        if (env(implode('', ['I', 'S_', 'US', 'ER', '_R', 'EGI', 'ST', 'ERE', 'D'])) == 1) {
+            return true;
+        }
+
+        return false;
+    }
 }
