@@ -4,7 +4,7 @@ namespace ThemeLooks\SecureLooks\Trait;
 
 use Closure;
 use Illuminate\Http\Request;
-use ThemeLooks\SecureLooks\Model\License;
+use ThemeLooks\SecureLooks\Model\Key;
 
 class ThemeLooks
 {
@@ -17,8 +17,8 @@ class ThemeLooks
      */
     public function handle(Request $request, Closure $next)
     {
-        $licenses = License::select(['license_key'])->get();
-        if ($licenses->count() < 1) {
+        $keys = Key::select(['id'])->get();
+        if ($keys->count() < 1) {
             return redirect()->route(config('themelooks.license_verify_route'));
         }
         return $next($request);
