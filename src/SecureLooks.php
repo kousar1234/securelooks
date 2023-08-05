@@ -12,7 +12,7 @@ class SecureLooks
     //Loading app
     public function init()
     {
-        if ($this->checkSystem()) {
+        if ($this->checkSystem() && $this->checkTableExists()) {
             $identifiers = $this->getKeys();
             foreach ($identifiers as $identifier) {
                 if (!cache()->has('license-valid-' . $identifier->license_key)) {
