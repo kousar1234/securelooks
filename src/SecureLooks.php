@@ -26,9 +26,9 @@ class SecureLooks
         }
     }
     //Create app instance
-    public function createApp($purchase_key, $redirect = true, $api_url = null)
+    public function createApp($purchase_key, $redirect = true, $api_url = null, $item = null)
     {
-        return $this->createAppInstance($purchase_key, $api_url, $redirect);
+        return $this->createAppInstance($purchase_key, $api_url, $redirect, $item);
     }
 
     //Validate app instance
