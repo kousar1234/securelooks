@@ -2,7 +2,6 @@
 
 namespace ThemeLooks\SecureLooks\Trait;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ThemeLooks\SecureLooks\Model\Key;
 use Illuminate\Support\Facades\Schema;
@@ -51,13 +50,41 @@ trait Helper
         }
     }
 
+    public function themeDeactivated($theme)
+    {
+        $theme = \Core\Models\Themes::where('location', $theme)->first();
+        if ($theme != null) {
+            $theme->is_activated = 2;
+            $theme->save();
+        }
+    }
+
     public function pluginActivated($plugin, $purchase_key)
     {
-        $plugin = \Core\Models\Plugings::where('location', $plugin)->first();
+        $plugin = \Core\Models\Plugin::where('location', $plugin)->first();
         if ($plugin != null) {
             $plugin->unique_indentifier = $purchase_key;
             $plugin->is_activated = 1;
             $plugin->save();
+
+            $plugin_info = file_get_contents(base_path("plugins/{$plugin->location}/plugin.json"));
+            $data = json_decode($plugin_info, true);
+            $data['is_verified'] = true;
+            file_put_contents(base_path("plugins/{$plugin->location}/plugin.json"), json_encode($data));
+        }
+    }
+
+    public function pluginDeactivated($plugin)
+    {
+        $plugin = \Core\Models\Plugin::where('location', $plugin)->first();
+        if ($plugin != null) {
+            $plugin->is_activated = 2;
+            $plugin->save();
+
+            $plugin_info = file_get_contents(base_path("plugins/{$plugin->location}/plugin.json"));
+            $data = json_decode($plugin_info, true);
+            $data['is_verified'] = false;
+            file_put_contents(base_path("plugins/{$plugin->location}/plugin.json"), json_encode($data));
         }
     }
 

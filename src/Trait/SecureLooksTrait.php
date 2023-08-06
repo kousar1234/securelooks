@@ -184,20 +184,22 @@ trait SecureLooksTrait
 
                             //Plugin
                             if ($license_info->item_is == 2) {
-                                $plugin = \Core\Models\Plugings::where('location', $license_info->item)->first();
-                                if ($plugin != null) {
-                                    $plugin->is_activated = 2;
-                                    $plugin->save();
-                                }
+                                $this->pluginDeactivated($license_info->item);
+                                // $plugin = \Core\Models\Plugin::where('location', $license_info->item)->first();
+                                // if ($plugin != null) {
+                                //     $plugin->is_activated = 2;
+                                //     $plugin->save();
+                                // }
                             }
 
                             //Theme
                             if ($license_info->item_is == 3) {
-                                $theme = \Core\Models\Themes::where('location', $license_info->item)->first();
-                                if ($theme != null) {
-                                    $theme->is_activated = 2;
-                                    $theme->save();
-                                }
+                                $this->themeDeactivated($license_info->item);
+                                // $theme = \Core\Models\Themes::where('location', $license_info->item)->first();
+                                // if ($theme != null) {
+                                //     $theme->is_activated = 2;
+                                //     $theme->save();
+                                // }
                             }
                         }
 
