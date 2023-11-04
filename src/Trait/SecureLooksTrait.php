@@ -62,7 +62,7 @@ trait SecureLooksTrait
                     //Core item
                     if ($license_info['item_is'] == 1) {
                         $this->removeCoreItemKeys();
-                        $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
+                        $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is'], $license_info['type']);
                         $this->completedRegisterApp();
                         if ($redirect) {
                             return redirect()->route(config('themelooks.license_activate_success_route'));
@@ -73,7 +73,7 @@ trait SecureLooksTrait
 
                     //Plugin
                     if ($license_info['item_is'] == 2) {
-                        $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
+                        $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is'], $license_info['type']);
                         $this->pluginActivated($license_info['item'], $purchase_key);
                         if ($redirect) {
                             return redirect()->route(config('themelooks.plugin_success_route'));
@@ -84,7 +84,7 @@ trait SecureLooksTrait
 
                     //Theme
                     if ($license_info['item_is'] == 3) {
-                        $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
+                        $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is'], $license_info['type']);
                         $this->themeActivated($license_info['item'], $purchase_key);
                         if ($redirect) {
                             return redirect()->route(config('themelooks.theme_success_route'));
@@ -166,7 +166,7 @@ trait SecureLooksTrait
                             //Core item
                             if ($license_info['item_is'] == 1) {
                                 $this->removeCoreItemKeys();
-                                $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is']);
+                                $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is'], $license_info['type']);
                                 $this->completedRegisterApp();
                                 return redirect()->route(config('themelooks.license_verify_success_route'));
                             }

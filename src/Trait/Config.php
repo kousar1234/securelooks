@@ -26,4 +26,13 @@ trait Config
 
         return false;
     }
+
+    public function checkSass()
+    {
+        if (config('themelooks.type') == 'sass') {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -25,12 +25,21 @@ trait Helper
         return Key::where('license_key', $key)->first();
     }
 
-    public function storeOrUpdateLicenseKey($item, $license_key, $item_is)
+    public function storeOrUpdateLicenseKey($item, $license_key, $item_is, $type)
     {
-        $license = Key::firstOrCreate(['item' => $item]);
-        $license->license_key = $license_key;
-        $license->item_is = $item_is;
-        $license->save();
+        if (config('themelooks.type') == 'sass') {
+            $license = Key::firstOrCreate(['item' => $item]);
+            $license->license_key = $license_key;
+            $license->item_is = $item_is;
+            $license->type = $type;
+            $license->save();
+        } else {
+            $license = Key::firstOrCreate(['item' => $item]);
+            $license->license_key = $license_key;
+            $license->item_is = $item_is;
+            $license->save();
+        }
+
         Cache::forget('user_keys');
     }
 
@@ -92,13 +101,24 @@ trait Helper
     {
         try {
             if (!Schema::hasTable('user_keys')) {
-                Schema::create('user_keys', function (Blueprint $table) {
-                    $table->id();
-                    $table->text('license_key')->nullable();
-                    $table->string('item')->nullable();
-                    $table->integer('item_is')->nullable();
-                    $table->timestamps();
-                });
+                if (config('themelooks.type') == 'sass') {
+                    Schema::create('user_keys', function (Blueprint $table) {
+                        $table->id();
+                        $table->text('license_key')->nullable();
+                        $table->string('item')->nullable();
+                        $table->integer('item_is')->nullable();
+                        $table->string('type')->nullable();
+                        $table->timestamps();
+                    });
+                } else {
+                    Schema::create('user_keys', function (Blueprint $table) {
+                        $table->id();
+                        $table->text('license_key')->nullable();
+                        $table->string('item')->nullable();
+                        $table->integer('item_is')->nullable();
+                        $table->timestamps();
+                    });
+                }
             }
             return true;
         } catch (\Exception $e) {

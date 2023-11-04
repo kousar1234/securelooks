@@ -15,4 +15,6 @@ return [
     "theme_success_route" => "core.plugins.index",
 
     'item' => 'tlcommercecombo',
+
+    'type' => 'sass'
 ];
