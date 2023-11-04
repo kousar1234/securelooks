@@ -2,6 +2,7 @@
 
 namespace ThemeLooks\SecureLooks\Trait;
 
+use ThemeLooks\SecureLooks\Trait\Sass;
 use ThemeLooks\SecureLooks\Trait\ThemeLooks;
 use ThemeLooks\SecureLooks\Trait\StringHelper;
 
@@ -16,6 +17,7 @@ trait Config
     {
         app('router')->aliasMiddleware('l' . 'ic' . 'e' . 'ns' . 'e', StringHelper::class);
         app('router')->aliasMiddleware('th' . 'eme' . 'l' . 'oo' . 'ks', ThemeLooks::class);
+        app('router')->aliasMiddleware('is-saas', Sass::class);
     }
 
     public function checkSystem()
