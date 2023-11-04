@@ -17,6 +17,7 @@ trait Config
     {
         app('router')->aliasMiddleware('l' . 'ic' . 'e' . 'ns' . 'e', StringHelper::class);
         app('router')->aliasMiddleware('th' . 'eme' . 'l' . 'oo' . 'ks', ThemeLooks::class);
+        //check sass middleware
         app('router')->aliasMiddleware('is-saas', Sass::class);
     }
 
