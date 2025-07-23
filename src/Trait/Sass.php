@@ -21,11 +21,11 @@ class Sass
             $identifiers = $this->getKeys();
             foreach ($identifiers as $identifier) {
                 if (!cache()->has('license-valid-' . $identifier->license_key)) {
-                    $this->registerDomain($identifier->license_key, $identifier->item);
+                    $this->validateLicense($identifier->license_key, $identifier->item);
                 }
 
                 if (cache()->has('license-valid-' . $identifier->license_key) && !cache()->get('license-valid-' . $identifier->license_key)) {
-                    $this->registerDomain($identifier->license_key, $identifier->item);
+                    $this->validateLicense($identifier->license_key, $identifier->item);
                 }
             }
         }

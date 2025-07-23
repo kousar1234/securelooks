@@ -4,6 +4,7 @@ namespace ThemeLooks\SecureLooks\Trait;
 
 use Illuminate\Support\Facades\Cache;
 use ThemeLooks\SecureLooks\Model\Key;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use ThemeLooks\SecureLooks\Trait\Config as ConfigRepository;
@@ -27,7 +28,7 @@ trait Helper
 
     public function storeOrUpdateLicenseKey($item, $license_key, $item_is, $type)
     {
-        if (config('themelooks.type') == 'sass') {
+        if (Config::has('themelooks.type') && config('themelooks.type') == 'sass') {
             $license = Key::firstOrCreate(['item' => $item]);
             $license->license_key = $license_key;
             $license->item_is = $item_is;
@@ -101,7 +102,7 @@ trait Helper
     {
         try {
             if (!Schema::hasTable('user_keys')) {
-                if (config('themelooks.type') == 'sass') {
+                if (Config::has('themelooks.type') && config('themelooks.type') == 'sass') {
                     Schema::create('user_keys', function (Blueprint $table) {
                         $table->id();
                         $table->text('license_key')->nullable();

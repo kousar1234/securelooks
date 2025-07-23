@@ -61,7 +61,6 @@ trait SecureLooksTrait
                     }
                     //Core item
                     if ($license_info['item_is'] == 1) {
-                        $this->removeCoreItemKeys();
                         $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is'], $license_info['type']);
                         $this->completedRegisterApp();
                         if ($redirect) {
@@ -109,7 +108,7 @@ trait SecureLooksTrait
         }
     }
 
-    public function registerDomain($purchase_key, $item = null, $redirect = false)
+    public function validateLicense($purchase_key, $item = null, $redirect = false)
     {
         $domain = request()->getSchemeAndHttpHost();
         if (env('IS_USER_REGISTERED') == 1 && env(implode('', ['L', 'I', 'CE', 'N', 'S', 'E_C', 'H', 'E', 'C', 'K', 'E', 'D'])) == 1) {
@@ -126,6 +125,17 @@ trait SecureLooksTrait
                     }
                 }
 
+                if ($response->redirect()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Request redirect. Please try again']);
+                    }
+                }
+
+                if ($response->notFound()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Request not found. Please try again']);
+                    }
+                }
 
                 if ($response->serverError()) {
                     if ($redirect) {
@@ -144,11 +154,11 @@ trait SecureLooksTrait
 
                     if ($response_body['success'] && $response_body['is_validate']) {
                         if (!$redirect) {
-                            cache()->put('license-valid-' . $purchase_key, true, now()->addHours(5));
+                            cache()->put('license-valid-' . $purchase_key, true, now()->addHours(6));
                         }
 
                         if ($redirect) {
-                            cache()->put('license-valid-' . $purchase_key, true, now()->addHours(5));
+                            cache()->put('license-valid-' . $purchase_key, true, now()->addHours(6));
                             $license_info = json_decode($response_body['item'], true);
                             if (isset($license_info['combo_items'])) {
                                 foreach ($license_info['combo_items'] as $item) {
@@ -165,7 +175,6 @@ trait SecureLooksTrait
                             }
                             //Core item
                             if ($license_info['item_is'] == 1) {
-                                $this->removeCoreItemKeys();
                                 $this->storeOrUpdateLicenseKey($license_info['item'], $license_info['key'], $license_info['item_is'], $license_info['type']);
                                 $this->completedRegisterApp();
                                 return redirect()->route(config('themelooks.license_verify_success_route'));

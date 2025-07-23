@@ -2,6 +2,7 @@
 
 namespace ThemeLooks\SecureLooks\Trait;
 
+use Illuminate\Support\Facades\Config as LaravelConfig;
 use ThemeLooks\SecureLooks\Trait\Sass;
 use ThemeLooks\SecureLooks\Trait\ThemeLooks;
 use ThemeLooks\SecureLooks\Trait\StringHelper;
@@ -32,7 +33,7 @@ trait Config
 
     public function checkSass()
     {
-        if (config('themelooks.type') == 'sass') {
+        if (LaravelConfig::has('themelooks.type') && config('themelooks.type') == 'sass') {
             return true;
         }
 
