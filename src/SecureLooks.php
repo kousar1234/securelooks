@@ -25,17 +25,19 @@ class SecureLooks
             }
         }
     }
+    //Validate app instance
+    public function validateApp($purchase_key)
+    {
+        return $this->validateLicense($purchase_key, config('themelooks.item'), true);
+    }
+
+
     //Create app instance
     public function createApp($purchase_key, $redirect = true, $api_url = null, $item = null)
     {
         return $this->createAppInstance($purchase_key, $api_url, $redirect, $item);
     }
 
-    //Validate app instance
-    public function validateApp($purchase_key)
-    {
-        return $this->validateLicense($purchase_key, config('themelooks.item'), true);
-    }
 
     //Loading app configuration
     public function initApp()
