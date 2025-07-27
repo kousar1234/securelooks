@@ -280,20 +280,20 @@ trait SecureLooksTrait
 
                     if ($response_body['success'] && $response_body['deactivated']) {
                         $license_info = $this->getKeyInfo($purchase_key);
-                        $this->removeLicenseKeyFromDB($license_info->key);
 
+                        $this->removeLicenseKeyFromDB($license_info->license_key);
                         //Core item
                         if ($license_info->item_is == 1) {
                             $this->redirectToActiveLicense();
                         }
 
                         //Plugin
-                        if ($item->item_is == 2) {
+                        if ($license_info->item_is == 2) {
                             $this->pluginDeactivated($license_info->item);
                         }
 
                         //Theme
-                        if ($item->item_is == 3) {
+                        if ($license_info->item_is == 3) {
                             $this->themeDeactivated($license_info->item);
                         }
 
@@ -328,5 +328,7 @@ trait SecureLooksTrait
                 return false;
             }
         }
+
+        return to_route(config('core.license.active'));
     }
 }
