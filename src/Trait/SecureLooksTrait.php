@@ -224,4 +224,109 @@ trait SecureLooksTrait
             }
         }
     }
+
+    public function removeLicense($purchase_key, $item = null, $redirect = false)
+    {
+        $domain = request()->getSchemeAndHttpHost();
+        if (env('IS_USER_REGISTERED') == 1 && env(implode('', ['L', 'I', 'CE', 'N', 'S', 'E_C', 'H', 'E', 'C', 'K', 'E', 'D'])) == 1) {
+            try {
+                $response = Http::withOptions(['verify' => false])->post($this->baseApiUrl() . '/api/v1/deactivate-domain', [
+                    'purchase_key' => $purchase_key,
+                    'domain' => $domain,
+                    'item' => $item
+                ]);
+
+                if ($response->failed()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Request failed. Please try again']);
+                    }
+
+                    return false;
+                }
+
+                if ($response->redirect()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Request redirect. Please try again']);
+                    }
+
+                    return false;
+                }
+
+                if ($response->notFound()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Request not found. Please try again']);
+                    }
+
+                    return false;
+                }
+
+                if ($response->serverError()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Server error. Please try again']);
+                    }
+                    return false;
+                }
+
+                if ($response->clientError()) {
+                    if ($redirect) {
+                        return redirect()->back()->withErrors(['message' => 'Client error. Please try again']);
+                    }
+
+                    return false;
+                }
+
+                if ($response->ok()) {
+                    $response_body = json_decode($response->body(), true);
+
+                    if ($response_body['success'] && $response_body['deactivated']) {
+                        $license_info = $this->getKeyInfo($purchase_key);
+                        $this->removeLicenseKeyFromDB($license_info->key);
+
+                        //Core item
+                        if ($license_info->item_is == 1) {
+                            $this->redirectToActiveLicense();
+                        }
+
+                        //Plugin
+                        if ($item->item_is == 2) {
+                            $this->pluginDeactivated($license_info->item);
+                        }
+
+                        //Theme
+                        if ($item->item_is == 3) {
+                            $this->themeDeactivated($license_info->item);
+                        }
+
+                        if ($redirect) {
+                            return redirect()->route(config('themelooks.license_verify_success_route'));
+                        }
+
+                        return true;
+                    }
+
+                    if ($response_body['success'] && !$response_body['deactivated']) {
+                        if (!$redirect) {
+                            return false;
+                        }
+
+                        return redirect()->back()->withErrors(['message' => 'Something went wrong']);
+                    }
+
+                    return false;
+                }
+            } catch (\Exception $e) {
+                if ($redirect) {
+                    return redirect()->back()->withErrors(['message' => 'Something went wrong. Please try again']);
+                }
+
+                return false;
+            } catch (\Error $e) {
+                if ($redirect) {
+                    return redirect()->back()->withErrors(['message' => 'Something went wrong. Please try again']);
+                }
+
+                return false;
+            }
+        }
+    }
 }

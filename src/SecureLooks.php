@@ -44,4 +44,15 @@ class SecureLooks
     {
         $this->loadConfig();
     }
+
+    public function removeLicenseKey($purchase_key, $item)
+    {
+        return $this->removeLicense($purchase_key, $item, false);
+    }
+
+
+    public function getUserKeys()
+    {
+        return $this->getKeys();
+    }
 }

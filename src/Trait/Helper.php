@@ -44,6 +44,12 @@ trait Helper
         Cache::forget('user_keys');
     }
 
+    public function removeLicenseKeyFromDB($key)
+    {
+        Key::where('license_key', $key)->delete();
+        Cache::forget('user_keys');
+    }
+
     public function removeCoreItemKeys()
     {
         Key::where('item_is', 1)->delete();
